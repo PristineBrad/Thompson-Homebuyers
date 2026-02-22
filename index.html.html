@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thompson Homebuyers — CCE</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lime:#b2ff00;--lime2:#ccff55;--limeDim:#7ab800;
+  --black:#0a0a0a;--black2:#111;--black3:#181818;--black4:#222;
+  --white:#f0f0f0;--gray1:#2a2a2a;--gray2:#3e3e3e;--gray3:#888;--gray4:#bbb;
+  --blue:#1e90ff;--orange:#ff8c00;--red:#ff3b3b;--green:#22dd66;
+  --yellow:#ffd700;--purple:#a855f7;--teal:#00bcd4;
+  --border:rgba(178,255,0,0.14);--border2:rgba(255,255,255,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--black);color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:13px;min-height:100vh;}
+
+/* HEADER */
+header{background:var(--black2);border-bottom:2px solid var(--lime);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 20px rgba(178,255,0,0.1);}
+.brand h1{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;color:var(--lime);letter-spacing:4px;line-height:1;}
+.brand p{font-size:.55rem;letter-spacing:5px;text-transform:uppercase;color:var(--gray3);}
+.hdr-stats{display:flex;gap:20px;align-items:center;}
+.hdr-stat .sl{font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gray3);}
+.hdr-stat .sv{font-family:'IBM Plex Mono',monospace;font-size:1.1rem;color:var(--lime);font-weight:600;}
+.hdr-stat .sv.blue{color:var(--blue);}
+.sep{width:1px;height:32px;background:var(--gray2);}
+.hdr-right{display:flex;gap:8px;align-items:center;}
+.county-sel{background:var(--black3);border:1px solid var(--gray2);color:var(--lime);font-size:.7rem;padding:5px 8px;border-radius:3px;cursor:pointer;outline:none;}
+.county-sel option{background:var(--black3);}
+.btn{background:var(--lime);color:var(--black);border:none;padding:7px 16px;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border-radius:3px;cursor:pointer;transition:background .15s;}
+.btn:hover{background:var(--lime2);}
+.btn-ghost{background:transparent;color:var(--lime);border:1px solid var(--lime);padding:6px 14px;font-family:'Bebas Neue',sans-serif;font-size:.9rem;letter-spacing:2px;border-radius:3px;cursor:pointer;transition:all .15s;}
+.btn-ghost:hover{background:var(--lime);color:var(--black);}
+
+/* PROPERTY BAR */
+.prop-bar{background:var(--black3);border-bottom:1px solid var(--border2);padding:9px 28px;display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;}
+.pf{display:flex;flex-direction:column;gap:3px;}
+.pf label{font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--lime);opacity:.75;}
+.pf input{background:transparent;border:none;border-bottom:1px solid rgba(178,255,0,0.2);color:var(--white);font-family:'IBM Plex Sans',sans-serif;font-size:.8rem;padding:3px 0;outline:none;width:130px;transition:border-color .2s;}
+.pf input:focus{border-color:var(--lime);}
+.pf input::placeholder{color:var(--gray3);}
+
+/* MAIN */
+main{padding:18px 28px 80px;max-width:1700px;margin:0 auto;}
+
+/* INFO BAR */
+.info-bar{background:rgba(30,144,255,0.07);border:1px solid rgba(30,144,255,0.2);border-radius:4px;padding:8px 14px;margin-bottom:14px;font-size:.62rem;color:var(--gray4);line-height:1.8;}
+.info-bar strong{color:var(--blue);}
+
+/* LEGEND */
+.legend{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px;padding:6px 0;border-bottom:1px solid var(--border2);}
+.leg{display:flex;align-items:center;gap:5px;font-size:.62rem;color:var(--gray4);}
+.leg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+/* SUMMARY */
+.sumrow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:18px;}
+.scard{background:var(--black3);border:1px solid var(--border);border-radius:4px;padding:10px 12px;}
+.scard .sl{font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--gray3);margin-bottom:4px;}
+.scard .sv{font-family:'IBM Plex Mono',monospace;font-size:1rem;color:var(--lime);font-weight:600;}
+.scard.hl{border-color:var(--lime);background:rgba(178,255,0,0.04);}
+.scard.bl{border-color:rgba(30,144,255,0.4);}.scard.bl .sv{color:var(--blue);}
+
+/* SECTIONS */
+.sec{background:var(--black3);border:1px solid var(--border2);border-radius:6px;margin-bottom:10px;overflow:hidden;}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 18px;cursor:pointer;user-select:none;background:linear-gradient(90deg,rgba(178,255,0,0.07) 0%,transparent 55%);transition:background .15s;}
+.sec-hdr:hover{background:linear-gradient(90deg,rgba(178,255,0,0.12) 0%,transparent 55%);}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:3px;color:var(--lime);display:flex;align-items:center;gap:8px;}
+.sec-meta{display:flex;align-items:center;gap:14px;}
+.sec-tot{font-family:'IBM Plex Mono',monospace;font-size:.9rem;color:var(--lime2);}
+.sec-cnt{font-size:.6rem;color:var(--gray3);}
+.chev{color:var(--lime);font-size:.75rem;transition:transform .3s;display:inline-block;}
+.chev.op{transform:rotate(180deg);}
+.sec-body{display:none;padding-bottom:6px;}
+.sec-body.op{display:block;}
+
+/* COLUMN HEADERS */
+.col-hdr{display:grid;grid-template-columns:40px 1fr 65px 72px 78px 96px 96px 64px 90px;gap:5px;padding:6px 18px;font-size:.52rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray3);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);}
+.col-hdr span{text-align:center;}
+.col-hdr span:nth-child(2){text-align:left;}
+.col-hdr span:last-child{text-align:right;}
+.col-hdr .mkt-h{color:var(--blue);}
+
+/* CATEGORY */
+.cat-blk{border-top:1px solid rgba(255,255,255,0.03);}
+.cat-lbl{padding:7px 18px 3px;font-size:.55rem;letter-spacing:3px;text-transform:uppercase;color:var(--lime);opacity:.6;font-weight:600;display:flex;align-items:center;gap:7px;}
+.flag{background:rgba(255,140,0,0.12);color:var(--orange);font-size:.48rem;letter-spacing:1px;padding:2px 6px;border-radius:2px;border:1px solid rgba(255,140,0,0.25);}
+
+/* ROW */
+.rrow{display:grid;grid-template-columns:40px 1fr 65px 72px 78px 96px 96px 64px 90px;gap:5px;padding:4px 18px;align-items:center;border-radius:3px;transition:background .12s;}
+.rrow:hover{background:rgba(255,255,255,0.02);}
+.rrow.act{background:rgba(178,255,0,0.035);}
+.rrow.act:hover{background:rgba(178,255,0,0.065);}
+
+/* Y/N */
+.yn{display:flex;width:36px;height:20px;border-radius:10px;overflow:hidden;border:1px solid var(--gray2);cursor:pointer;flex-shrink:0;}
+.yny,.ynn{flex:1;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:.58rem;font-weight:700;transition:background .12s;}
+.yny{color:var(--gray3);}
+.ynn{color:var(--gray3);}
+.yn.yes .yny{background:var(--green);color:#000;}
+.yn.no .ynn{background:var(--red);color:#fff;}
+
+.rname{font-size:.72rem;color:var(--gray4);line-height:1.3;}
+.rrow.act .rname{color:var(--white);}
+
+/* LM toggle */
+.lmt{display:flex;border:1px solid var(--gray2);border-radius:3px;overflow:hidden;}
+.lmb{padding:2px 5px;font-size:.52rem;font-family:'IBM Plex Mono',monospace;cursor:pointer;background:transparent;color:var(--gray3);border:none;transition:background .12s;white-space:nowrap;}
+.lmb.al{background:var(--blue);color:#fff;}
+.lmb.am{background:var(--orange);color:#000;}
+.lmb.alm{background:var(--purple);color:#fff;}
+
+/* inputs */
+.inp{background:var(--black4);border:1px solid var(--gray2);border-radius:3px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:.72rem;padding:3px 5px;width:100%;outline:none;transition:border-color .15s;text-align:right;}
+.inp:focus{border-color:var(--lime);}
+.inp:disabled{opacity:.2;cursor:not-allowed;}
+select.inp{text-align:left;cursor:pointer;}
+.ipw{position:relative;}
+.ipre{position:absolute;left:5px;top:50%;transform:translateY(-50%);color:var(--gray3);font-size:.65rem;pointer-events:none;}
+.inp.hp{padding-left:13px;}
+/* market col */
+.mkt-inp{background:rgba(30,144,255,0.08)!important;border-color:rgba(30,144,255,0.3)!important;}
+.mkt-inp:focus{border-color:var(--blue)!important;}
+.mkt-lbl{font-size:.48rem;color:var(--blue);opacity:.75;text-align:center;margin-top:1px;}
+
+/* row total */
+.rtot{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:var(--lime2);text-align:right;font-weight:600;}
+.rtot.z{color:var(--gray2);}
+.vbadge{font-size:.5rem;padding:1px 4px;border-radius:2px;margin-left:3px;}
+.vover{background:rgba(255,59,59,.15);color:var(--red);}
+.vund{background:rgba(34,221,102,.15);color:var(--green);}
+
+/* BOTTOM */
+.btgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px;}
+.btcard{background:var(--black3);border:1px solid var(--border2);border-radius:6px;padding:18px;}
+.btcard h3{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:3px;color:var(--lime);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border2);}
+.trow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.77rem;}
+.trow .tl{color:var(--gray4);}
+.trow .tv{font-family:'IBM Plex Mono',monospace;color:var(--lime2);}
+.trow.gnd{border-top:2px solid var(--lime);border-bottom:none;margin-top:7px;padding-top:9px;}
+.trow.gnd .tl{color:var(--white);font-weight:600;font-size:.85rem;}
+.trow.gnd .tv{color:var(--lime);font-size:1.05rem;font-weight:700;}
+.da-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.77rem;}
+.da-row label{color:var(--gray4);}
+.daw{position:relative;}
+.daw .dp{position:absolute;left:7px;top:50%;transform:translateY(-50%);color:var(--gray3);font-size:.7rem;pointer-events:none;}
+.da-inp{background:var(--black4);border:1px solid var(--gray2);border-radius:3px;color:var(--white);font-family:'IBM Plex Mono',monospace;font-size:.78rem;padding:4px 7px 4px 17px;width:145px;text-align:right;outline:none;}
+.da-inp:focus{border-color:var(--lime);}
+.daval{font-family:'IBM Plex Mono',monospace;color:var(--lime2);font-size:.82rem;font-weight:600;}
+.da-row.prof .daval{color:var(--green);font-size:.95rem;}
+.da-row.prof.neg .daval{color:var(--red);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><h1>Thompson Homebuyers</h1><p>Construction Cost Estimator</p></div>
+  <div class="hdr-stats">
+    <div class="hdr-stat"><div class="sl">Your Price Total</div><div class="sv" id="h-your">$0</div></div>
+    <div class="sep"></div>
+    <div class="hdr-stat"><div class="sl">Market Estimate</div><div class="sv blue" id="h-mkt">$0</div></div>
+    <div class="sep"></div>
+    <div class="hdr-stat"><div class="sl">Active Items</div><div class="sv" id="h-items">0</div></div>
+  </div>
+  <div class="hdr-right">
+    <select class="county-sel" id="county" onchange="applyCounty()">
+      <option value="fairfax">Fairfax Co., VA</option>
+      <option value="montgomery">Montgomery Co., MD</option>
+      <option value="avg">DMV Average</option>
+    </select>
+    <button class="btn-ghost" onclick="window.print()">⎙ Print</button>
+    <button class="btn" onclick="resetAll()">↺ Reset</button>
+  </div>
+</header>
+
+<div class="prop-bar">
+  <div class="pf"><label>Address</label><input type="text" id="pa" placeholder="123 Main St" style="width:180px"></div>
+  <div class="pf"><label>Vacant</label><input type="text" id="pv" placeholder="Yes/No" style="width:70px"></div>
+  <div class="pf"><label>Bed</label><input type="number" id="pb" placeholder="#" style="width:45px"></div>
+  <div class="pf"><label>Bath</label><input type="number" id="pbt" placeholder="#" style="width:45px"></div>
+  <div class="pf"><label>Sq Ft</label><input type="number" id="psf" placeholder="1800" style="width:75px"></div>
+  <div class="pf"><label>Year Built</label><input type="number" id="pyr" placeholder="1985" style="width:65px"></div>
+  <div class="pf"><label>Inspected By</label><input type="text" id="pin" placeholder="Name" style="width:120px"></div>
+  <div class="pf"><label>Date</label><input type="date" id="pdt"></div>
+</div>
+
+<main>
+
+<div class="info-bar">
+  <strong>📊 Market Pricing — Fairfax Co. VA &amp; Montgomery Co. MD (Feb 2026):</strong>
+  Sources include HomeGuide, Remodeling Magazine Mid-Atlantic Cost vs. Value Report, NOVA/DMV contractor data, and local trade surveys. Prices reflect labor + materials unless noted. Switch county using the dropdown in the header.
+  &nbsp;|&nbsp; <strong style="color:var(--blue)">Blue column</strong> = market estimated price (always editable) &nbsp;|&nbsp; <strong>Variance badges</strong> show % difference between your price and market &nbsp;|&nbsp;
+  <strong style="color:var(--blue)">Labor</strong> / <strong style="color:var(--orange)">Mat</strong> / <strong style="color:var(--purple)">L+M</strong> toggle tracks scope per line item.
+</div>
+
+<div class="legend">
+  <div class="leg"><div class="leg-dot" style="background:var(--green)"></div>Y = Item Included</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--red)"></div>N = Excluded</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--blue)"></div>Labor only</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--orange)"></div>Materials only</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--purple)"></div>Labor + Materials</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--blue);opacity:.4"></div>Blue col = Market Est. (editable)</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--red);opacity:.5"></div>Red % = Your price above market</div>
+  <div class="leg"><div class="leg-dot" style="background:var(--green);opacity:.5"></div>Green % = Your price below market</div>
+</div>
+
+<div class="sumrow">
+  <div class="scard"><div class="sl">Exterior</div><div class="sv" id="sc-e">$0</div></div>
+  <div class="scard"><div class="sl">Interior</div><div class="sv" id="sc-i">$0</div></div>
+  <div class="scard"><div class="sl">Mechanicals</div><div class="sv" id="sc-m">$0</div></div>
+  <div class="scard"><div class="sl">Other</div><div class="sv" id="sc-o">$0</div></div>
+  <div class="scard hl"><div class="sl">Your Price Total</div><div class="sv" id="sc-t">$0</div></div>
+  <div class="scard bl"><div class="sl">Market Est. Total</div><div class="sv" id="sc-mk">$0</div></div>
+</div>
+
+<div id="secs"></div>
+
+<div class="btgrid">
+  <div class="btcard">
+    <h3>💰 Cost Summary</h3>
+    <div class="trow"><span class="tl">Exterior</span><span class="tv" id="t-e">$0</span></div>
+    <div class="trow"><span class="tl">Interior</span><span class="tv" id="t-i">$0</span></div>
+    <div class="trow"><span class="tl">Mechanicals</span><span class="tv" id="t-m">$0</span></div>
+    <div class="trow"><span class="tl">Other / Demo / Permits</span><span class="tv" id="t-o">$0</span></div>
+    <div class="trow">
+      <span class="tl">Contingency
+        <select id="cont" style="background:transparent;border:none;color:var(--gray4);font-size:.72rem;cursor:pointer;outline:none;" onchange="recalc()">
+          <option value="0">0%</option><option value=".05">5%</option><option value=".1" selected>10%</option><option value=".15">15%</option><option value=".2">20%</option>
+        </select>
+      </span>
+      <span class="tv" id="t-c">$0</span>
+    </div>
+    <div class="trow gnd"><span class="tl">TOTAL (Your Price)</span><span class="tv" id="t-grand">$0</span></div>
+    <div class="trow" style="margin-top:6px"><span class="tl" style="color:var(--blue)">Market Est. Grand Total</span><span class="tv" style="color:var(--blue)" id="t-mktg">$0</span></div>
+    <div class="trow"><span class="tl" style="color:var(--gray3)">Variance</span><span class="tv" id="t-var">—</span></div>
+  </div>
+  <div class="btcard">
+    <h3>📈 Deal Analysis</h3>
+    <div class="da-row"><label>After Repair Value (ARV)</label><div class="daw"><span class="dp">$</span><input class="da-inp" type="number" id="arv" placeholder="0" oninput="updateDA()"></div></div>
+    <div class="da-row"><label>Purchase Price</label><div class="daw"><span class="dp">$</span><input class="da-inp" type="number" id="purchase" placeholder="0" oninput="updateDA()"></div></div>
+    <div class="da-row"><label>Holding / Closing Costs</label><div class="daw"><span class="dp">$</span><input class="da-inp" type="number" id="holding" placeholder="0" oninput="updateDA()"></div></div>
+    <div class="da-row"><label>Agent Commissions</label><div class="daw"><span class="dp">$</span><input class="da-inp" type="number" id="comm" placeholder="0" oninput="updateDA()"></div></div>
+    <div class="da-row"><label>Total Repairs</label><span class="daval" id="da-rep">$0</span></div>
+    <div class="da-row"><label>Total All-In Cost</label><span class="daval" id="da-allin">$0</span></div>
+    <div class="da-row"><label style="color:var(--yellow)">70% Rule Max Offer</label><span class="daval" style="color:var(--yellow)" id="da-70">$0</span></div>
+    <div class="da-row prof" id="da-prow"><label>Estimated Profit</label><span class="daval" id="da-profit">$0</span></div>
+    <div class="da-row"><label>ROI</label><span class="daval" id="da-roi">—</span></div>
+  </div>
+</div>
+</main>
+
+<script>
+// ============================================================
+// MARKET PRICING TABLE  [fairfax, montgomery]  Feb 2026
+// Sources: HomeGuide, Remodeling Mag Mid-Atlantic, DMV contractor surveys
+// ============================================================
+const MKT={
+  "roof-rip":[6.50,7.20],"roof-rollover":[4.00,4.50],"roof-sheath":[3.50,4.00],
+  "roof-ph":[850,950],"roof-pe":[450,550],"roof-3layer":[0.75,0.85],"roof-steep":[0.60,0.70],
+  "fascia":[8.00,9.00],"soffit":[7.50,8.50],
+  "gut-flat":[2200,2600],"gut-lf":[9.00,11.00],
+  "demo-fin":[1.25,1.50],"stucco":[11.00,13.00],"wood-sid":[9.00,11.00],
+  "vinyl-sid":[4.00,5.00],"fiber-cem":[10.00,12.00],"ply-sid":[4.50,5.50],
+  "patch-ext":[750,900],"pw-ext":[0.35,0.40],
+  "fireplace":[6500,8000],"con-blk":[9.00,11.00],"stone":[25.00,30.00],
+  "brick":[16.00,19.00],"tuckpt":[7.00,8.50],"pw-mas":[0.40,0.50],
+  "pnt-both":[2.50,3.00],"pnt-ext":[1.75,2.25],"pnt-trim":[1.50,1.75],
+  "sand-dk":[3.50,4.00],"pnt-fence":[2.50,3.00],"pnt-gar":[650,800],
+  "win-vinyl":[400,475],"win-wood":[850,1000],"win-bay":[1800,2200],
+  "gar-1car":[1100,1300],"gar-2car":[1600,1900],"gar-open":[350,425],
+  "gar-reroof":[6.00,7.00],"gar-new":[40000,50000],
+  "land-lg":[7500,9000],"land-med":[4500,5500],"land-sm":[2500,3000],
+  "cleanup":[750,900],"tree-rm":[700,900],"tree-pl":[200,250],
+  "demo-con":[3.50,4.50],"con-inst":[9.00,11.00],"asp-inst":[5.00,6.50],"gravel":[3.00,4.00],
+  "deck-15":[4200,5000],"deck-10":[2800,3500],"deck-treat":[22.00,27.00],
+  "deck-ced":[30.00,36.00],"deck-rep":[12.00,15.00],"deck-ref":[3.50,4.50],
+  "rail-wd":[28.00,35.00],"rail-mt":[55.00,70.00],
+  "perg-15":[3500,4500],"perg-10":[2500,3200],
+  "fence-wd":[22.00,27.00],"fence-ir":[65.00,80.00],"fence-ch":[16.00,20.00],
+  "pool-full":[20000,25000],"pool-plas":[6500,8000],
+  "sep-new":[18000,22000],"sep-tank":[6500,8000],"sep-leach":[4000,5500],
+  "int-pnt":[1.75,2.25],"wall-prep":[0.85,1.00],
+  "hwd-sol":[12.00,15.00],"hwd-eng":[9.00,11.00],"lam":[5.50,7.00],"hwd-ref":[4.00,5.00],
+  "carpet":[3.50,4.50],"vinyl-fl":[3.00,4.00],
+  "tile-kit":[14.00,17.00],"back-sp":[18.00,22.00],"tile-ba":[14.00,17.00],
+  "shwr-tile":[20.00,25.00],"shwr-acc":[25.00,30.00],"tile-oth":[12.00,15.00],
+  "kit-hi":[60000,75000],"kit-med":[42000,55000],"kit-lo":[18000,22000],
+  "kit-ref":[10000,13000],"kit-cust":[1500,2500],
+  "cab-lf":[400,650],"ctr-sf":[85,110],"sink-k":[450,600],"fau-k":[300,400],"disp":[275,350],
+  "app-lux":[18000,25000],"app-hi":[9000,12000],"app-med":[5500,7000],"app-lo":[2800,3500],
+  "fridge":[600,800],"range":[400,600],"hood":[350,500],"dish":[500,700],"micro":[275,400],
+  "bath-mas":[22000,28000],"bath-full":[12000,15000],"bath-half":[6500,8500],
+  "van-cab":[600,900],"van-top":[700,950],"van-mir":[250,400],
+  "sink-b":[300,450],"fau-b":[200,300],"toilet":[600,850],
+  "tub-fg":[1800,2400],"tub-sur":[2200,2800],"shwr-stl":[2500,3200],
+  "shwr-kit":[650,900],"twl-bar":[120,180],
+  "frm-new":[45,55],"frm-int":[28,35],"lb-wall":[3500,5000],"subfloor":[3.50,4.50],
+  "ins-wal":[1.75,2.25],"ins-fl":[1.50,2.00],"ins-att":[1.25,1.75],
+  "dw-gut":[8.00,10.00],"dw-wal":[4.50,5.50],"dw-ceil":[5.00,6.50],
+  "skim":[2.00,2.75],"dw-pat":[750,1000],
+  "drs-3k":[6500,8000],"drs-15k":[4500,5500],"dr-pre":[350,500],"dr-clo":[275,400],
+  "dr-ext":[1200,1600],"dr-fr":[1600,2200],"dr-sl":[1200,1600],
+  "crown":[7.00,9.00],"base":[5.00,7.00],"wains":[22.00,28.00],
+  "bsmt-con":[65,80],"bsmt-seal":[2800,3800],"sump":[1800,2500],
+  "fr-drain":[55,75],"rfr-beam":[2500,3500],"rep-stair":[3500,4500],
+  "ex-ftg":[45,60],"ex-bkfill":[12,16],"fnd-ftg":[150,200],
+  "fnd-slab":[7.50,10.00],"fnd-stem":[120,160],"fnd-rep":[15000,25000],
+  "fnd-mud":[800,1200],"fnd-ibeam":[700,1000],"fnd-pier":[1200,1600],
+  "hvac-full":[12000,16000],"hvac-ht":[7500,10000],"hvac-unit":[3500,4500],
+  "ac-only":[4000,5500],"duct":[4500,6000],"boil-sys":[9000,12000],
+  "boil-unit":[4500,6000],"wall-htr":[900,1200],"hvac-svc":[250,350],
+  "plmb-full":[18000,25000],"wh-tnkls":[2800,3800],"wh-gas40":[1400,1800],
+  "elec-full":[18000,25000],"elec-bas":[7500,10000],"elec-pan":[3500,5000],"elec-lt":[3500,5000],
+  "demo-dmp":[700,900],"dmpstr":[600,750],
+  "termite":[2500,3500],"mold":[3500,5000],"asbestos":[8000,12000],
+  "perm-rem":[800,1200],"perm-add":[1200,1800],"perm-dk":[350,500],
+  "perm-otc":[200,300],"perm-cfs":[1000,1500],"perm-cad":[1500,2200],"perm-cdk":[400,600],
+  "staging":[3500,4500],
+};
+
+function getMkt(k){
+  const s=document.getElementById('county').value;
+  if(!MKT[k])return null;
+  if(s==='fairfax')return MKT[k][0];
+  if(s==='montgomery')return MKT[k][1];
+  return (MKT[k][0]+MKT[k][1])/2;
+}
+
+// ============================================================
+// ITEM DATA
+// ============================================================
+const DATA=[
+ {s:"EXTERIOR",ico:"🏠",id:"exterior",cats:[
+  {n:"Roof",fl:"Additional Quotes / Inspections May Be Needed",items:[
+   {n:"Roof — rip & replace, architectural shingle",u:["sf","ls"],du:"sf",dp:4.00,mk:"roof-rip"},
+   {n:"Rollover — add layer, architectural shingle",u:["sf","ls"],du:"sf",dp:2.50,mk:"roof-rollover"},
+   {n:"Roof Sheathing — plywood 1/2\", remove & install",u:["sf","ls"],du:"sf",dp:2.00,mk:"roof-sheath"},
+   {n:"Roof repair / patch (hard)",u:["ea","ls"],du:"ea",dp:900,mk:"roof-ph"},
+   {n:"Roof repair / patch (easy)",u:["ea","ls"],du:"ea",dp:600,mk:"roof-pe"},
+   {n:"Premium — 3-layer tear off",u:["sf","ls"],du:"sf",dp:0.35,mk:"roof-3layer"},
+   {n:"Premium — steep pitched roof",u:["sf","ls"],du:"sf",dp:0.20,mk:"roof-steep"},
+   {n:"Fascia — demo & install new",u:["lf","sf","ls"],du:"lf",dp:3.00,mk:"fascia"},
+   {n:"Soffit — demo & install new",u:["lf","sf","ls"],du:"lf",dp:4.00,mk:"soffit"},
+  ]},
+  {n:"Gutters",items:[
+   {n:"Gutters & downspouts — flat cost",u:["ls"],du:"ls",dp:1500,mk:"gut-flat"},
+   {n:"Gutters & downspouts — per linear foot",u:["lf","ls"],du:"lf",dp:6.00,mk:"gut-lf"},
+  ]},
+  {n:"Exterior Finish / Siding",items:[
+   {n:"Demo existing finishing material",u:["sf","ls"],du:"sf",dp:0.75,mk:"demo-fin"},
+   {n:"Stucco",u:["sf","ls"],du:"sf",dp:7.00,mk:"stucco"},
+   {n:"Wood siding",u:["sf","ls"],du:"sf",dp:6.00,mk:"wood-sid"},
+   {n:"Vinyl siding",u:["sf","ls"],du:"sf",dp:2.25,mk:"vinyl-sid"},
+   {n:"Fiber cement siding",u:["sf","ls"],du:"sf",dp:7.00,mk:"fiber-cem"},
+   {n:"Plywood panel siding",u:["sf","ls"],du:"sf",dp:2.50,mk:"ply-sid"},
+   {n:"Patch exterior section",u:["ls","ea"],du:"ls",dp:500,mk:"patch-ext"},
+   {n:"Power wash exterior finish",u:["sf","ls"],du:"sf",dp:0.75,mk:"pw-ext"},
+  ]},
+  {n:"Masonry",items:[
+   {n:"Fireplace / chimney — brick/stone replace",u:["ls","ea"],du:"ls",dp:5000,mk:"fireplace"},
+   {n:"Concrete block",u:["sf","ls"],du:"sf",dp:6.00,mk:"con-blk"},
+   {n:"Stone",u:["sf","ls"],du:"sf",dp:18.00,mk:"stone"},
+   {n:"Brick",u:["sf","ls"],du:"sf",dp:11.50,mk:"brick"},
+   {n:"Tuckpoint brick",u:["sf","ls"],du:"sf",dp:3.50,mk:"tuckpt"},
+   {n:"Power wash exterior masonry",u:["sf","ls"],du:"sf",dp:0.75,mk:"pw-mas"},
+  ]},
+  {n:"Painting",items:[
+   {n:"Painting — ext & int, whole property",u:["sf","ls"],du:"sf",dp:2.00,mk:"pnt-both"},
+   {n:"Painting — exterior only",u:["sf","ls"],du:"sf",dp:1.00,mk:"pnt-ext"},
+   {n:"Paint trim only",u:["lf","ls"],du:"lf",dp:1.00,mk:"pnt-trim"},
+   {n:"Sand & refinish / paint deck",u:["sf","ls"],du:"sf",dp:2.00,mk:"sand-dk"},
+   {n:"Paint fence",u:["sf","lf","ls"],du:"sf",dp:1.65,mk:"pnt-fence"},
+   {n:"Paint detached garage",u:["ls","ea"],du:"ls",dp:450,mk:"pnt-gar"},
+  ]},
+  {n:"Windows",items:[
+   {n:"Windows — vinyl, average size",u:["ea","ls"],du:"ea",dp:200,mk:"win-vinyl"},
+   {n:"Windows — wood, restore (historical)",u:["ea","ls"],du:"ea",dp:450,mk:"win-wood"},
+   {n:"Window — large bay, remove & replace",u:["ea","ls"],du:"ea",dp:850,mk:"win-bay"},
+  ]},
+  {n:"Garage",items:[
+   {n:"Garage Door — 1 Car, 9'x7', manual",u:["ea","ls"],du:"ea",dp:775,mk:"gar-1car"},
+   {n:"Garage Door — 2 Car, 16', manual",u:["ea","ls"],du:"ea",dp:1000,mk:"gar-2car"},
+   {n:"Garage Door Opener installed",u:["ea","ls"],du:"ea",dp:225,mk:"gar-open"},
+   {n:"Reroof detached garage — rip & replace",u:["sf","ls"],du:"sf",dp:4.00,mk:"gar-reroof"},
+   {n:"Build new detached garage",u:["ls","ea"],du:"ls",dp:30000,mk:"gar-new"},
+  ]},
+  {n:"Landscaping",items:[
+   {n:"Full landscaping — large lot",u:["ls"],du:"ls",dp:5000,mk:"land-lg"},
+   {n:"Full landscaping — medium lot",u:["ls"],du:"ls",dp:3500,mk:"land-med"},
+   {n:"Full landscaping — small lot",u:["ls"],du:"ls",dp:2000,mk:"land-sm"},
+   {n:"Clean up landscaping & yard only",u:["ls"],du:"ls",dp:500,mk:"cleanup"},
+   {n:"Tree removal (per tree)",u:["ea","ls"],du:"ea",dp:500,mk:"tree-rm"},
+   {n:"Tree planting (per tree)",u:["ea","ls"],du:"ea",dp:130,mk:"tree-pl"},
+  ]},
+  {n:"Concrete / Asphalt",items:[
+   {n:"Demo existing concrete or asphalt",u:["sf","ls"],du:"sf",dp:2.00,mk:"demo-con"},
+   {n:"Concrete — driveway / patio / sidewalk",u:["sf","ls"],du:"sf",dp:7.00,mk:"con-inst"},
+   {n:"Asphalt — driveway",u:["sf","ls"],du:"sf",dp:4.00,mk:"asp-inst"},
+   {n:"Gravel — driveway / sidewalk",u:["sf","ls"],du:"sf",dp:2.00,mk:"gravel"},
+  ]},
+  {n:"Decks",items:[
+   {n:"New deck 15'x15' (permit if 30\" off ground)",u:["ea","ls"],du:"ea",dp:3000,mk:"deck-15"},
+   {n:"New deck 10'x10'",u:["ea","ls"],du:"ea",dp:2000,mk:"deck-10"},
+   {n:"New deck — treated lumber",u:["sf","ls"],du:"sf",dp:15.00,mk:"deck-treat"},
+   {n:"New deck — cedar material",u:["sf","ls"],du:"sf",dp:19.00,mk:"deck-ced"},
+   {n:"Decking material replacement only",u:["sf","ls"],du:"sf",dp:7.00,mk:"deck-rep"},
+   {n:"Sand & refinish deck only",u:["sf","ls"],du:"sf",dp:2.00,mk:"deck-ref"},
+   {n:"New railings — wood",u:["lf","ls"],du:"lf",dp:20.00,mk:"rail-wd"},
+   {n:"New railings — metal",u:["lf","ls"],du:"lf",dp:40.00,mk:"rail-mt"},
+  ]},
+  {n:"Pergola",items:[
+   {n:"New pergola canopy 15'x15'",u:["ea","ls"],du:"ea",dp:2500,mk:"perg-15"},
+   {n:"New pergola canopy 10'x10'",u:["ea","ls"],du:"ea",dp:2000,mk:"perg-10"},
+  ]},
+  {n:"Fence",items:[
+   {n:"Wood fencing",u:["lf","sf","ls"],du:"lf",dp:15.00,mk:"fence-wd"},
+   {n:"Wrought iron fencing",u:["lf","sf","ls"],du:"lf",dp:45.00,mk:"fence-ir"},
+   {n:"Chain-link fence",u:["lf","sf","ls"],du:"lf",dp:8.00,mk:"fence-ch"},
+  ]},
+  {n:"Pool",fl:"Additional Inspections May Be Needed",items:[
+   {n:"Pool completely redone",u:["ea","ls"],du:"ea",dp:12500,mk:"pool-full"},
+   {n:"Pool — redo plaster only",u:["ea","ls"],du:"ea",dp:5000,mk:"pool-plas"},
+  ]},
+  {n:"Septic",fl:"Quotes & Inspections Required",items:[
+   {n:"Septic — all new system",u:["ea","ls"],du:"ea",dp:15000,mk:"sep-new"},
+   {n:"Septic — new tank only",u:["ea","ls"],du:"ea",dp:5500,mk:"sep-tank"},
+   {n:"Septic — replace leach field only",u:["ea","ls"],du:"ea",dp:3000,mk:"sep-leach"},
+  ]},
+ ]},
+ {s:"INTERIOR",ico:"🪟",id:"interior",cats:[
+  {n:"Painting",items:[
+   {n:"Interior painting only",u:["sf","ls"],du:"sf",dp:1.00,mk:"int-pnt"},
+   {n:"Extra wall prep — damaged walls",u:["sf","ls"],du:"sf",dp:0.50,mk:"wall-prep"},
+  ]},
+  {n:"Flooring — Hardwood",items:[
+   {n:"Hardwood flooring — solid wood",u:["sf","ls"],du:"sf",dp:7.00,mk:"hwd-sol"},
+   {n:"Engineered hardwood flooring",u:["sf","ls"],du:"sf",dp:6.00,mk:"hwd-eng"},
+   {n:"Laminate hardwood flooring",u:["sf","ls"],du:"sf",dp:4.00,mk:"lam"},
+   {n:"Sand & refinish existing hardwood",u:["sf","ls"],du:"sf",dp:2.00,mk:"hwd-ref"},
+  ]},
+  {n:"Flooring — Carpet / Vinyl",items:[
+   {n:"Carpet",u:["sf","ls"],du:"sf",dp:1.35,mk:"carpet"},
+   {n:"Vinyl or linoleum flooring",u:["sf","ls"],du:"sf",dp:2.00,mk:"vinyl-fl"},
+  ]},
+  {n:"Tile",items:[
+   {n:"Ceramic floor tile — kitchen",u:["sf","ls"],du:"sf",dp:10.00,mk:"tile-kit"},
+   {n:"Backsplash wall tile — kitchen",u:["sf","ls"],du:"sf",dp:15.00,mk:"back-sp"},
+   {n:"Ceramic floor tile — bathrooms",u:["sf","ls"],du:"sf",dp:8.00,mk:"tile-ba"},
+   {n:"Shower wall tile — bathrooms (70 sf typical)",u:["sf","ls"],du:"sf",dp:9.00,mk:"shwr-tile"},
+   {n:"Shower accent wall tile",u:["sf","ls"],du:"sf",dp:16.00,mk:"shwr-acc"},
+   {n:"Ceramic floor tile — other areas",u:["sf","ls"],du:"sf",dp:8.00,mk:"tile-oth"},
+  ]},
+  {n:"Kitchen (Grouped)",items:[
+   {n:"High end kitchen — cabinets, countertops, backsplash, plumbing & electrical (excl. appliances & flooring)",u:["ea","ls"],du:"ea",dp:12500,mk:"kit-hi"},
+   {n:"Median kitchen",u:["ea","ls"],du:"ea",dp:10500,mk:"kit-med"},
+   {n:"Low end kitchen",u:["ea","ls"],du:"ea",dp:8500,mk:"kit-lo"},
+   {n:"Low end kitchen — refinish existing cabinets",u:["ea","ls"],du:"ea",dp:6500,mk:"kit-ref"},
+   {n:"Kitchen extra custom items",u:["ls","ea"],du:"ls",dp:500,mk:"kit-cust"},
+  ]},
+  {n:"Kitchen (By Item)",items:[
+   {n:"Cabinets",u:["lf","ea","ls"],du:"lf",dp:185,mk:"cab-lf"},
+   {n:"Countertops",u:["sf","ls"],du:"sf",dp:65,mk:"ctr-sf"},
+   {n:"Sink",u:["ea","ls"],du:"ea",dp:350,mk:"sink-k"},
+   {n:"Sink Faucet",u:["ea","ls"],du:"ea",dp:250,mk:"fau-k"},
+   {n:"Garbage Disposal",u:["ea","ls"],du:"ea",dp:250,mk:"disp"},
+  ]},
+  {n:"Appliances (Grouped)",items:[
+   {n:"Luxury appliances — fridge, range, hood, dishwasher, microwave",u:["ea","ls"],du:"ea",dp:9000,mk:"app-lux"},
+   {n:"High end appliances",u:["ea","ls"],du:"ea",dp:5500,mk:"app-hi"},
+   {n:"Median appliances",u:["ea","ls"],du:"ea",dp:3000,mk:"app-med"},
+   {n:"Low end appliances",u:["ea","ls"],du:"ea",dp:700,mk:"app-lo"},
+  ]},
+  {n:"Appliances (By Item)",items:[
+   {n:"Refrigerator",u:["ea","ls"],du:"ea",dp:150,mk:"fridge"},
+   {n:"Range",u:["ea","ls"],du:"ea",dp:75,mk:"range"},
+   {n:"Range Hood",u:["ea","ls"],du:"ea",dp:125,mk:"hood"},
+   {n:"Dishwasher",u:["ea","ls"],du:"ea",dp:150,mk:"dish"},
+   {n:"Microwave",u:["ea","ls"],du:"ea",dp:200,mk:"micro"},
+  ]},
+  {n:"Bathroom (Grouped)",items:[
+   {n:"Large master bath — replace everything (excl. flooring & paint)",u:["ea","ls"],du:"ea",dp:4500,mk:"bath-mas"},
+   {n:"Full bath — replace everything",u:["ea","ls"],du:"ea",dp:2500,mk:"bath-full"},
+   {n:"Half bath — replace everything",u:["ea","ls"],du:"ea",dp:1500,mk:"bath-half"},
+  ]},
+  {n:"Bathroom (By Item)",items:[
+   {n:"Vanity cabinet",u:["ea","ls"],du:"ea",dp:450,mk:"van-cab"},
+   {n:"Vanity countertop — granite or hard surface",u:["ea","ls"],du:"ea",dp:500,mk:"van-top"},
+   {n:"Vanity mirror",u:["ea","ls"],du:"ea",dp:400,mk:"van-mir"},
+   {n:"Sink",u:["ea","ls"],du:"ea",dp:210,mk:"sink-b"},
+   {n:"Sink Faucet",u:["ea","ls"],du:"ea",dp:75,mk:"fau-b"},
+   {n:"Toilet",u:["ea","ls"],du:"ea",dp:350,mk:"toilet"},
+   {n:"Bathtub — fiberglass",u:["ea","ls"],du:"ea",dp:1200,mk:"tub-fg"},
+   {n:"Bathtub & shower surround — fiberglass",u:["ea","ls"],du:"ea",dp:850,mk:"tub-sur"},
+   {n:"Shower stall & surround — fiberglass",u:["ea","ls"],du:"ea",dp:600,mk:"shwr-stl"},
+   {n:"Showerhead & faucet kit",u:["ea","ls"],du:"ea",dp:400,mk:"shwr-kit"},
+   {n:"Bathroom towel bar kit",u:["ea","ls"],du:"ea",dp:75,mk:"twl-bar"},
+  ]},
+  {n:"Framing",items:[
+   {n:"New construction framing — walls, floors & roof",u:["sf","ls"],du:"sf",dp:30.00,mk:"frm-new"},
+   {n:"Interior framing changes — non load bearing",u:["sf","ls","ea"],du:"sf",dp:15.00,mk:"frm-int"},
+   {n:"Open load bearing / structural wall",u:["ea","ls"],du:"ea",dp:3000,mk:"lb-wall"},
+   {n:"Subfloor — 3/4\" plywood",u:["sf","ls"],du:"sf",dp:1.85,mk:"subfloor"},
+  ]},
+  {n:"Insulation",items:[
+   {n:"Wall insulation",u:["sf","ls"],du:"sf",dp:1.00,mk:"ins-wal"},
+   {n:"Floor insulation",u:["sf","ls"],du:"sf",dp:1.25,mk:"ins-fl"},
+   {n:"Attic insulation — blown-in",u:["sf","ls"],du:"sf",dp:0.80,mk:"ins-att"},
+  ]},
+  {n:"Drywall / Walls",items:[
+   {n:"Drywall, tape & skimcoat — gutted house",u:["sf","ls"],du:"sf",dp:6.00,mk:"dw-gut"},
+   {n:"Drywall, tape & skimcoat — wall 1/2\"",u:["sf","ls"],du:"sf",dp:2.50,mk:"dw-wal"},
+   {n:"Drywall, tape & skimcoat — ceiling 1/2\"",u:["sf","ls"],du:"sf",dp:4.00,mk:"dw-ceil"},
+   {n:"Skimcoating / texturing walls & ceilings only",u:["sf","ls"],du:"sf",dp:1.00,mk:"skim"},
+   {n:"Patchwork section — drywall, tape & finish",u:["ea","ls"],du:"ea",dp:500,mk:"dw-pat"},
+  ]},
+  {n:"Doors & Trim",items:[
+   {n:"New int. doors, closet doors, hardware & trim — 3,000 sf",u:["ea","ls"],du:"ea",dp:4000,mk:"drs-3k"},
+   {n:"New int. doors, closet doors, hardware & trim — 1,500 sf",u:["ea","ls"],du:"ea",dp:2000,mk:"drs-15k"},
+   {n:"Interior door — prehung hollow-core",u:["ea","ls"],du:"ea",dp:175,mk:"dr-pre"},
+   {n:"Interior swing-out double panel closet doors",u:["ea","ls"],du:"ea",dp:95,mk:"dr-clo"},
+   {n:"Exterior front door — single w/ hardware & deadbolt",u:["ea","ls"],du:"ea",dp:700,mk:"dr-ext"},
+   {n:"Exterior french patio door — double",u:["ea","ls"],du:"ea",dp:850,mk:"dr-fr"},
+   {n:"Exterior sliding glass door — double",u:["ea","ls"],du:"ea",dp:500,mk:"dr-sl"},
+   {n:"Crown molding",u:["lf","ls"],du:"lf",dp:3.75,mk:"crown"},
+   {n:"New baseboard trim",u:["lf","ls"],du:"lf",dp:2.75,mk:"base"},
+   {n:"Raised panel wood wainscoting",u:["lf","ls"],du:"lf",dp:17.50,mk:"wains"},
+  ]},
+  {n:"Basement",items:[
+   {n:"Pour concrete floor in basement",u:["sy","sf","ls"],du:"sy",dp:175,mk:"bsmt-con"},
+   {n:"Seal basement",u:["ea","ls"],du:"ea",dp:1000,mk:"bsmt-seal"},
+   {n:"Install sump pump",u:["ea","ls"],du:"ea",dp:1000,mk:"sump"},
+   {n:"Install french drains",u:["sf","lf","ls"],du:"sf",dp:20.00,mk:"fr-drain"},
+   {n:"Reframe support beam",u:["ea","ls"],du:"ea",dp:100,mk:"rfr-beam"},
+   {n:"Replace stairs",u:["ea","ls"],du:"ea",dp:500,mk:"rep-stair"},
+  ]},
+  {n:"Foundation",fl:"Inspections & Quotes Required",items:[
+   {n:"Excavation — dig footing trenching",u:["lf","ls"],du:"lf",dp:30.00,mk:"ex-ftg"},
+   {n:"Excavation — backfill of trenches",u:["lf","ls"],du:"lf",dp:4.00,mk:"ex-bkfill"},
+   {n:"New foundation — pour concrete footing",u:["lf","ls"],du:"lf",dp:100,mk:"fnd-ftg"},
+   {n:"New foundation — concrete slab on grade 4\"",u:["sf","ls"],du:"sf",dp:10000,mk:"fnd-slab"},
+   {n:"New foundation — stem wall, single story",u:["lf","ls"],du:"lf",dp:500,mk:"fnd-stem"},
+   {n:"Repair existing foundation ($10k min)",u:["ea","ls"],du:"ea",dp:10000,mk:"fnd-rep"},
+   {n:"Repair foundation — stair mud jacking",u:["ea","ls"],du:"ea",dp:500,mk:"fnd-mud"},
+   {n:"Repair foundation — bowing walls w/ I-beams",u:["ea","ls"],du:"ea",dp:500,mk:"fnd-ibeam"},
+   {n:"Repair foundation — settled walls w/ piers",u:["ea","ls"],du:"ea",dp:850,mk:"fnd-pier"},
+  ]},
+ ]},
+ {s:"MECHANICALS",ico:"⚙️",id:"mechanicals",cats:[
+  {n:"HVAC",items:[
+   {n:"Gas forced hot air heat, AC & ductwork — complete",u:["ea","ls"],du:"ea",dp:6000,mk:"hvac-full"},
+   {n:"Gas forced hot air heat & ductwork",u:["ea","ls"],du:"ea",dp:4000,mk:"hvac-ht"},
+   {n:"Gas forced hot air unit only",u:["ea","ls"],du:"ea",dp:1700,mk:"hvac-unit"},
+   {n:"Air conditioning unit only",u:["ea","ls"],du:"ea",dp:2000,mk:"ac-only"},
+   {n:"Replace forced air ductwork only",u:["ea","ls"],du:"ea",dp:2300,mk:"duct"},
+   {n:"Replace boiler & hot water baseboard system",u:["ea","ls"],du:"ea",dp:6500,mk:"boil-sys"},
+   {n:"Replace boiler unit only",u:["ea","ls"],du:"ea",dp:3000,mk:"boil-unit"},
+   {n:"Wall heater — install new or replace",u:["ea","ls"],du:"ea",dp:600,mk:"wall-htr"},
+   {n:"Service heating & cooling system only",u:["ea","ls"],du:"ea",dp:500,mk:"hvac-svc"},
+  ]},
+  {n:"Plumbing",items:[
+   {n:"New plumbing system — entire house (1,500 sf, 3/2)",u:["ea","ls"],du:"ea",dp:7000,mk:"plmb-full"},
+   {n:"Replace tankless hot water heater",u:["ea","ls"],du:"ea",dp:1500,mk:"wh-tnkls"},
+   {n:"Replace gas hot water heater — 40 gallon",u:["ea","ls"],du:"ea",dp:600,mk:"wh-gas40"},
+  ]},
+  {n:"Electrical",items:[
+   {n:"Rewire entire house, new panel & lighting (1,500 sf)",u:["ea","ls"],du:"ea",dp:7000,mk:"elec-full"},
+   {n:"Basic electrical work & lighting fixtures (1,500 sf)",u:["ea","ls"],du:"ea",dp:3000,mk:"elec-bas"},
+   {n:"Replace electrical panel only",u:["ea","ls"],du:"ea",dp:2000,mk:"elec-pan"},
+   {n:"Replace all lighting fixtures (1,500 sf house)",u:["ea","ls"],du:"ea",dp:2000,mk:"elec-lt"},
+  ]},
+ ]},
+ {s:"OTHER",ico:"🔧",id:"other",cats:[
+  {n:"Demo & Dumpsters",items:[
+   {n:"Demolition work — 1 x 40yd dumpster fill",u:["ea","ls"],du:"ea",dp:500,mk:"demo-dmp"},
+   {n:"Dumpster rental — 40 yard",u:["ea","ls"],du:"ea",dp:500,mk:"dmpstr"},
+  ]},
+  {n:"Termites / Abatement",fl:"Additional Inspections May Be Needed",items:[
+   {n:"Termite fumigation & treatment",u:["ls","ea"],du:"ls",dp:1500,mk:"termite"},
+   {n:"Mold removal & abatement — minimum",u:["ls","ea"],du:"ls",dp:1500,mk:"mold"},
+   {n:"Asbestos removal & abatement — minimum",u:["ls","ea"],du:"ls",dp:5000,mk:"asbestos"},
+  ]},
+  {n:"Permits",fl:"Additional Permits May Be Required",items:[
+   {n:"Construction permits — remodel (city)",u:["ea","ls"],du:"ea",dp:600,mk:"perm-rem"},
+   {n:"Construction permits — addition (city)",u:["ea","ls"],du:"ea",dp:750,mk:"perm-add"},
+   {n:"Construction permits — deck (city)",u:["ea","ls"],du:"ea",dp:250,mk:"perm-dk"},
+   {n:"Construction permits — over the counter",u:["ea","ls"],du:"ea",dp:150,mk:"perm-otc"},
+   {n:"Construction permits — full submittal (county)",u:["ea","ls"],du:"ea",dp:600,mk:"perm-cfs"},
+   {n:"Construction permits — addition (county)",u:["ea","ls"],du:"ea",dp:600,mk:"perm-cad"},
+   {n:"Construction permits — deck (county)",u:["ea","ls"],du:"ea",dp:250,mk:"perm-cdk"},
+  ]},
+  {n:"Staging",items:[
+   {n:"Staging — Kitchen, Baths, Living Room & 1 Bedroom",u:["ea","ls"],du:"ea",dp:2000,mk:"staging"},
+  ]},
+ ]},
+];
+
+// BUILD DOM
+const secsEl=document.getElementById('secs');
+let ri=0;
+const rows=[];
+
+DATA.forEach(sec=>{
+  const se=document.createElement('div');
+  se.className='sec';se.dataset.sec=sec.id;
+  let cHTML='';
+  sec.cats.forEach(cat=>{
+    let iHTML='';
+    cat.items.forEach(item=>{
+      const i=ri++;
+      rows.push({i,sid:sec.id,mk:item.mk});
+      const uo=item.u.map(u=>`<option value="${u}"${u===item.du?' selected':''}>${u}</option>`).join('');
+      const mv=getMkt(item.mk);
+      iHTML+=`<div class="rrow" data-i="${i}" data-sid="${sec.id}">
+        <div class="yn no" data-i="${i}" onclick="toggleYN(${i})"><span class="yny">Y</span><span class="ynn">N</span></div>
+        <div class="rname">${item.n}</div>
+        <input class="inp" type="number" placeholder="Qty" min="0" step="any" disabled id="qty${i}" oninput="calc(${i})">
+        <select class="inp" disabled id="unit${i}" onchange="calc(${i})">${uo}</select>
+        <div class="lmt" id="lmt${i}">
+          <button class="lmb alm" onclick="setLM(${i},'lm')">L+M</button>
+          <button class="lmb" onclick="setLM(${i},'l')">Labor</button>
+          <button class="lmb" onclick="setLM(${i},'m')">Mat</button>
+        </div>
+        <div class="ipw"><span class="ipre">$</span><input class="inp hp" type="number" value="${item.dp.toFixed(2)}" min="0" step="0.01" disabled id="price${i}" oninput="calc(${i})"></div>
+        <div class="ipw"><span class="ipre">$</span><input class="inp hp mkt-inp" type="number" value="${mv?mv.toFixed(2):''}" placeholder="Market" id="mkt${i}" oninput="calc(${i})"><div class="mkt-lbl">MKT EST</div></div>
+        <div class="ipw"><span class="ipre">$</span><input class="inp hp" type="number" placeholder="Quote" min="0" step="0.01" disabled id="quote${i}" oninput="calc(${i})"></div>
+        <div class="rtot z" id="rt${i}">$0</div>
+      </div>`;
+    });
+    cHTML+=`<div class="cat-blk"><div class="cat-lbl">${cat.n}${cat.fl?`<span class="flag">⚠ ${cat.fl}</span>`:''}</div>${iHTML}</div>`;
+  });
+  se.innerHTML=`<div class="sec-hdr" onclick="toggleSec('${sec.id}')">
+    <div class="sec-title"><span>${sec.ico}</span>${sec.s}</div>
+    <div class="sec-meta"><span class="sec-cnt" id="cnt${sec.id}">0 items</span><span class="sec-tot" id="stot${sec.id}">$0</span><span class="chev op" id="chev${sec.id}">▼</span></div>
+  </div>
+  <div class="sec-body op" id="body${sec.id}">
+    <div class="col-hdr"><span>Y/N</span><span>Repair Item</span><span>Qty</span><span>Unit</span><span>Type</span><span>Your $/Unit</span><span class="mkt-h">Mkt Est $/Unit</span><span>Quote</span><span>Row Total</span></div>
+    ${cHTML}
+  </div>`;
+  secsEl.appendChild(se);
+});
+
+// STATE
+const rtots={};
+const lm={};
+rows.forEach(r=>{lm[r.i]='lm';});
+
+function toggleSec(id){
+  document.getElementById('body'+id).classList.toggle('op');
+  document.getElementById('chev'+id).classList.toggle('op');
+}
+
+function toggleYN(i){
+  const tog=document.querySelector(`.yn[data-i="${i}"]`);
+  const row=document.querySelector(`.rrow[data-i="${i}"]`);
+  const on=tog.classList.contains('no');
+  tog.classList.toggle('yes',on);tog.classList.toggle('no',!on);
+  row.classList.toggle('act',on);
+  ['qty','price','quote','unit'].forEach(p=>{const e=document.getElementById(p+i);if(e)e.disabled=!on;});
+  if(!on){rtots[i]=0;updateRT(i);recalc();}else calc(i);
+}
+
+function setLM(i,mode){
+  lm[i]=mode;
+  const w=document.getElementById('lmt'+i);
+  w.querySelectorAll('.lmb').forEach(b=>{
+    b.classList.remove('al','am','alm');
+    const m=b.textContent.trim().toLowerCase().replace('+','');
+    if((mode==='lm'&&b.textContent.includes('+'))||(mode==='l'&&b.textContent==='Labor')||(mode==='m'&&b.textContent==='Mat'))
+      b.classList.add(mode==='lm'?'alm':mode==='l'?'al':'am');
+  });
+}
+
+function calc(i){
+  const tog=document.querySelector(`.yn[data-i="${i}"]`);
+  if(!tog||tog.classList.contains('no')){rtots[i]=0;updateRT(i);recalc();return;}
+  const qty=parseFloat(document.getElementById('qty'+i)?.value)||0;
+  const pr=parseFloat(document.getElementById('price'+i)?.value)||0;
+  const qt=parseFloat(document.getElementById('quote'+i)?.value)||0;
+  rtots[i]=qt>0?qt:qty*pr;
+  updateRT(i);recalc();
+}
+
+function updateRT(i){
+  const el=document.getElementById('rt'+i);
+  const v=rtots[i]||0;
+  const mktV=parseFloat(document.getElementById('mkt'+i)?.value)||0;
+  const qty=parseFloat(document.getElementById('qty'+i)?.value)||0;
+  const mt=qty*mktV;
+  let badge='';
+  if(v>0&&mt>0){
+    const d=v-mt,p=Math.abs(d/mt*100).toFixed(0);
+    if(d>mt*.05)badge=`<span class="vbadge vover">+${p}%</span>`;
+    else if(d<-mt*.05)badge=`<span class="vbadge vund">-${p}%</span>`;
+  }
+  el.innerHTML=(v===0?'$0':'$'+v.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:0}))+badge;
+  el.className='rtot'+(v===0?' z':'');
+}
+
+function fmt(n){return'$'+Math.round(n).toLocaleString('en-US',{maximumFractionDigits:0});}
+
+function recalc(){
+  const t={exterior:0,interior:0,mechanicals:0,other:0};
+  const mt={exterior:0,interior:0,mechanicals:0,other:0};
+  let cnt=0;
+  rows.forEach(r=>{
+    const v=rtots[r.i]||0;
+    t[r.sid]=(t[r.sid]||0)+v;
+    if(v>0)cnt++;
+    const mv=parseFloat(document.getElementById('mkt'+r.i)?.value)||0;
+    const q=parseFloat(document.getElementById('qty'+r.i)?.value)||0;
+    const tog=document.querySelector(`.yn[data-i="${r.i}"]`);
+    if(tog&&tog.classList.contains('yes')&&q>0&&mv>0)mt[r.sid]=(mt[r.sid]||0)+q*mv;
+  });
+  DATA.forEach(s=>{
+    let c=0;rows.filter(r=>r.sid===s.id).forEach(r=>{if((rtots[r.i]||0)>0)c++;});
+    document.getElementById('stot'+s.id).textContent=fmt(t[s.id]||0);
+    document.getElementById('cnt'+s.id).textContent=c+' item'+(c!==1?'s':'');
+  });
+  const sub=Object.values(t).reduce((a,b)=>a+b,0);
+  const msub=Object.values(mt).reduce((a,b)=>a+b,0);
+  const cp=parseFloat(document.getElementById('cont').value)||0;
+  const con=sub*cp,grand=sub+con,mgrand=msub*(1+cp);
+  ['e','i','m','o'].forEach((k,j)=>{
+    const id=['exterior','interior','mechanicals','other'][j];
+    document.getElementById('sc-'+k).textContent=fmt(t[id]||0);
+    document.getElementById('t-'+k).textContent=fmt(t[id]||0);
+  });
+  document.getElementById('sc-t').textContent=fmt(grand);
+  document.getElementById('sc-mk').textContent=fmt(mgrand);
+  document.getElementById('t-c').textContent=fmt(con);
+  document.getElementById('t-grand').textContent=fmt(grand);
+  document.getElementById('t-mktg').textContent=fmt(mgrand);
+  const dv=grand-mgrand;
+  const varEl=document.getElementById('t-var');
+  if(grand===0&&mgrand===0){varEl.textContent='—';varEl.style.color='var(--gray3)';}
+  else{varEl.textContent=(dv>=0?'+':'')+fmt(dv);varEl.style.color=dv>0?'var(--red)':dv<0?'var(--green)':'var(--gray3)';}
+  document.getElementById('h-your').textContent=fmt(grand);
+  document.getElementById('h-mkt').textContent=fmt(mgrand);
+  document.getElementById('h-items').textContent=cnt;
+  updateDA(grand);
+}
+
+function updateDA(rep){
+  if(rep===undefined)rep=parseFloat((document.getElementById('t-grand').textContent||'0').replace(/[$,]/g,''))||0;
+  const arv=parseFloat(document.getElementById('arv').value)||0;
+  const pur=parseFloat(document.getElementById('purchase').value)||0;
+  const hld=parseFloat(document.getElementById('holding').value)||0;
+  const com=parseFloat(document.getElementById('comm').value)||0;
+  const allin=pur+hld+com+rep,profit=arv-allin,roi=allin>0?profit/allin*100:0;
+  const r70=arv*.7-rep;
+  document.getElementById('da-rep').textContent=fmt(rep);
+  document.getElementById('da-allin').textContent=fmt(allin);
+  document.getElementById('da-70').textContent=fmt(r70);
+  document.getElementById('da-profit').textContent=(profit<0?'-':'')+'$'+Math.abs(Math.round(profit)).toLocaleString('en-US',{maximumFractionDigits:0});
+  document.getElementById('da-roi').textContent=roi.toFixed(1)+'%';
+  document.getElementById('da-prow').classList.toggle('neg',profit<0);
+}
+
+function applyCounty(){
+  rows.forEach(r=>{
+    const mv=getMkt(r.mk);
+    const el=document.getElementById('mkt'+r.i);
+    if(el&&mv)el.value=mv.toFixed(2);
+  });
+  recalc();
+}
+
+function resetAll(){
+  if(!confirm('Reset all entries?'))return;
+  rows.forEach(r=>{
+    const i=r.i;rtots[i]=0;
+    const tog=document.querySelector(`.yn[data-i="${i}"]`);
+    if(tog){tog.classList.add('no');tog.classList.remove('yes');}
+    const row=document.querySelector(`.rrow[data-i="${i}"]`);
+    if(row)row.classList.remove('act');
+    ['qty','quote'].forEach(p=>{const e=document.getElementById(p+i);if(e){e.value='';e.disabled=true;}});
+    ['unit','price'].forEach(p=>{const e=document.getElementById(p+i);if(e)e.disabled=true;});
+    const rt=document.getElementById('rt'+i);if(rt){rt.textContent='$0';rt.className='rtot z';}
+  });
+  recalc();
+}
+
+document.getElementById('pdt').valueAsDate=new Date();
+</script>
+</body>
+</html>
